@@ -5,6 +5,24 @@
  * @LastEditTime: 2021-02-18 11:19:29
  * @Description: diff
 -->
+<!-- TOC -->
+
+- [React diff 算法](#react-diff-算法)
+    - [介绍](#介绍)
+    - [diff 算法](#diff-算法)
+        - [diff策略](#diff策略)
+        - [tree diff](#tree-diff)
+        - [component diff](#component-diff)
+        - [element diff](#element-diff)
+            - [element diff 节点移动](#element-diff-节点移动)
+                - [步骤1](#步骤1)
+                - [步骤2](#步骤2)
+                - [步骤3](#步骤3)
+                - [步骤4](#步骤4)
+                - [element diff 的缺点](#element-diff-的缺点)
+        - [Vue diff 和 React diff 区别](#vue-diff-和-react-diff-区别)
+
+<!-- /TOC -->
 # React diff 算法
 
 ## 介绍
@@ -127,3 +145,9 @@
 
 如上`D`，此时`D`不移动，但它的`index`是最大的，导致更新`lastIndex=3`，从而使得其他元素`A,B,C`的`index<lastIndex`，导致`A,B,C`都要去移动。
 理想情况是只移动`D`，不移动`A,B,C`。因此，在开发过程中，尽量减少类似将最后一个节点移动到列表首部的操作，当节点数量过大或更新操作过于频繁时，会影响`React`的渲染性能。
+
+### Vue diff 和 React diff 区别
+
+1. `Vue`的`patch`是即时的，并不是打包所有修改最后一起操作`DOM``React`则是将更新放入队列后集中处理。
+2. `Vue diff`使用了首尾指针，并优先处理了首尾指针的特殊情况，所以避免了`React diff`中特殊情况下，需要多次处理。如：`A,B,C,D`和`D,A,B,C`
+3. `Vue diff`具有**原地复用**特性，减少了`DOM`移动。
