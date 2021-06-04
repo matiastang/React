@@ -2,12 +2,52 @@
  * @Author: tangdaoyong
  * @Date: 2021-06-03 17:09:42
  * @LastEditors: tangdaoyong
- * @LastEditTime: 2021-06-03 17:16:55
+ * @LastEditTime: 2021-06-04 14:26:31
  * @Description: Antd
 -->
 # Antd
 
 ## 使用问题记录
+
+### Upload
+
+#### 受控模式 onChange 只调用一次的问题
+
+[受控模式 onChange 只调用一次的问题](https://github.com/ant-design/ant-design/issues/2423)
+**对于受控模式，你应该在 onChange 中始终 setState fileList，保证所有状态同步到 Upload 内。**类似这里的写法：http://ant.design/components/upload/#components-upload-demo-fileList
+```jsx
+// good
+
+onFileChange(fileList) {
+  if ( ... ) {
+    ...
+  } else {
+    ...
+  }
+  // always setState
+  this.setState({ fileList: [...fileList] });
+}
+
+...
+
+<Upload fileList={this.state.fileList} onChange={this.onFileChange} />
+// bad
+
+onFileChange(fileList) {
+  if ( ... ) {
+    this.setState({ fileList: [...fileList] });
+  } else {
+    ...
+  }
+}
+
+...
+
+<Upload fileList={this.state.fileList} onChange={this.onFileChange} />
+```
+建议研习受控组件概念：https://facebook.github.io/react/docs/forms.html#controlled-components
+
+
 
 ### Input
 
