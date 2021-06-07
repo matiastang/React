@@ -2,7 +2,7 @@
  * @Author: tangdaoyong
  * @Date: 2021-06-03 17:09:42
  * @LastEditors: tangdaoyong
- * @LastEditTime: 2021-06-04 14:26:31
+ * @LastEditTime: 2021-06-07 16:14:08
  * @Description: Antd
 -->
 # Antd
@@ -47,7 +47,60 @@ onFileChange(fileList) {
 ```
 建议研习受控组件概念：https://facebook.github.io/react/docs/forms.html#controlled-components
 
+#### 受控模式初始化已上传列表
 
+受控模式初始化已上传列表，需要列表中有`uid`、`name`、`status`等字段。
+```jsx
+getFileList = async () => {
+    let res = await getFiles();
+    /*
+    lastModified: 1622798352419
+    lastModifiedDate: Fri Jun 04 2021 17:19:12 GMT+0800 (中国标准时间) {}
+    name: "txtTest.txt"
+    originFileObj: File {uid: "rc-upload-1622800784366-2", name: "txtTest.txt", lastModified: 1622798352419, lastModifiedDate: Fri Jun 04 2021 17:19:12 GMT+0800 (中国标准时间), webkitRelativePath: "", …}
+    percent: 100
+    response: {success: true, statusCode: 1000, message: "成功", data: "ed0b84dbdcd68924da314bed0ad302e3.txt"}
+    size: 21
+    status: "done"
+    type: "text/plain"
+    uid: "rc-upload-1622800784366-2"
+    xhr: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 0, withCredentials: false, upload: XMLHttpRequestUpload, …}
+    */
+    this.setState({
+        uploadFileList: isArray(res) ? res.map((item) => {
+            return {
+                ...item,
+                uid: `rc-upload-${item.id}`,
+                name: `${item.fileName}`,
+                status: 'done',
+                url: ''
+            };
+        }) : []
+    });
+}
+/**
+  * 文件状态改变
+  * @param {*} param0 
+  */
+uploadOnChange = ({ file, fileList }) => {
+    if (file.status !== 'uploading') {
+        let uploadFiles = fileList.filter(() => {
+            return file.status === 'uploading';
+        });
+        // 没有处于上传中的
+        if (uploadFiles.length <= 0) {
+            this.setState({
+                fileUpdateDisabled: false
+            });
+        }
+    }
+    // 对于受控模式，你应该在 onChange 中始终 setState fileList，保证所有状态同步到 Upload 内。
+    this.setState({
+        uploadFileList: uniqBy(fileList.reverse(), 'name').reverse()
+    });
+};
+```
+**说明**`uploadFileList: uniqBy(fileList.reverse(), 'name').reverse()`,是例子中需要通过`name`去重，保留最后的文件，所以使用`reverse()`反转，也可以自己实现去重，比较简单。
 
 ### Input
 
